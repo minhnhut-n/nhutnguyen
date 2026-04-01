@@ -1,0 +1,5 @@
+﻿# Build artifacts
+build/
+_build/
+**/build/
+**/_build/

@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'website_readthedocs'
+project = 'IIV-Electronic Embedded'
 copyright = '2026, Nhut Nguyen'
 author = 'Nhut Nguyen'
 release = '1.0'
@@ -17,7 +17,7 @@ release = '1.0'
 extensions = []
 
 templates_path = ['_templates']
-exclude_patterns = []
+exclude_patterns = ['build', '_build']
 
 
 
