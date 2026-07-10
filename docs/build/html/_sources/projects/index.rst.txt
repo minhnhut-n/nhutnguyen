@@ -1,10 +1,13 @@
-Mini Projects
-=============
+﻿Projects
+========
 
-Mỗi project sẽ có một page riêng để chia sẻ.
+Project notes and mini write-ups. Each project can include blog-style notes.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Projects
+   :maxdepth: 1
+   :caption: Project List
 
-   placeholder
+   project_alpha
+   project_beta
+
+.. include:: ../_includes/contact_info.rst

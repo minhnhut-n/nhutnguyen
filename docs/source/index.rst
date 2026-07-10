@@ -1,16 +1,52 @@
-﻿Home
-====
+﻿.. IIV-Electronic Embedded documentation master file
 
-Welcome to the Knowledge Hub. This site collects technical notes, blog-style topics, and
-project write-ups that will grow over time.
+Trang chủ
+=========
+
+Chào mừng đến với **IIV-Electronic Embedded** — nơi tổng hợp tài liệu kỹ thuật
+về hệ thống nhúng, robot, và Linux.
+
+*(Khu vực này sau có thể để hình ảnh giao diện, giới thiệu, v.v.)*
+
+.. grid:: 2
+
+   .. grid-item-card:: 🤖 Embedded Robot
+      :link: embedded_robot/index
+      :link-type: doc
+      :class-card: sd-shadow-md
+
+      Robot control, ROS, sensors, actuators, and autonomous systems.
+
+   .. grid-item-card:: 🐧 Embedded Linux
+      :link: embedded_linux/index
+      :link-type: doc
+      :class-card: sd-shadow-md
+
+      Linux kernel, device drivers, Yocto/Buildroot, and system integration.
+
+   .. grid-item-card:: ⚙️ Embedded MCU
+      :link: embedded_mcu/index
+      :link-type: doc
+      :class-card: sd-shadow-md
+
+      Bare-metal, RTOS, STM32, ESP32, AVR, and low-level firmware.
+
+   .. grid-item-card:: 📂 Project List
+      :link: projects/index
+      :link-type: doc
+      :class-card: sd-shadow-md
+
+      Tất cả các project được phân loại theo từng mục.
 
 .. toctree::
    :maxdepth: 2
-   :caption: List of content
+   :caption: Sections
+   :hidden:
 
    self
-   headline/index
-   topics/index
+   embedded_robot/index
+   embedded_linux/index
+   embedded_mcu/index
    projects/index
 
 .. include:: _includes/contact_info.rst

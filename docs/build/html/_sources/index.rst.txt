@@ -1,13 +1,16 @@
-Knowledge Hub
-=============
+﻿Home
+====
 
-Tổng hợp ghi chú, bài viết kỹ thuật và các mini project. Mỗi chủ đề lớn có trang
-index riêng để mở rộng nội dung sau này.
+Welcome to the Knowledge Hub. This site collects technical notes, blog-style topics, and
+project write-ups that will grow over time.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Nội dung
+   :caption: List of content
 
-   os_scheduling/index
+   self
+   headline/index
+   topics/index
    projects/index
 
+.. include:: _includes/contact_info.rst
