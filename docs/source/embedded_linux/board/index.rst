@@ -9,5 +9,6 @@ Các board cụ thể: Raspberry Pi, Banana Pi M4, BeagleBone, ...
    :glob:
 
    *
+   banana_pi/index
 
 .. include:: ../../_includes/contact_info.rst
