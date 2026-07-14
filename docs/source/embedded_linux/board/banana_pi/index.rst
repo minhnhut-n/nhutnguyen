@@ -11,5 +11,6 @@ Tài liệu về Banana Pi boards.
 
    setup.rst
    schematic.rst
+   utility-cmd.rst
 
 .. include:: ../../../_includes/contact_info.rst

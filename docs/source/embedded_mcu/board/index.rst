@@ -9,5 +9,6 @@ Các board cụ thể: STM32, ESP32, AVR, PIC, ...
    :glob:
 
    *
+   esp32/index
 
 .. include:: ../../_includes/contact_info.rst
