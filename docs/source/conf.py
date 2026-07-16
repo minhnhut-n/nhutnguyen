@@ -2,6 +2,7 @@
 
 import os
 import sys
+sys.setrecursionlimit(5000)
 
 # -- Project information -----------------------------------------------------
 project = 'Nhut Nguyen'
@@ -45,10 +46,10 @@ html_static_path = ['_static']
 
 html_theme_options = {
     'navigation_depth': 4,
-    'collapse_navigation': False,
+    'collapse_navigation': True,
     'sticky_navigation': True,
     'includehidden': True,
-    'titles_only': True,
+    'titles_only': False,
 }
 
 suppress_warnings = ['myst.header']

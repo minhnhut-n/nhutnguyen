@@ -4,13 +4,12 @@ Banana Pi
 Tài liệu về Banana Pi boards.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Banana Pi
-   :titlesonly:
-   :glob:
 
-   setup.rst
-   schematic.rst
-   utility-cmd.rst
+   setup
+   schematic
+   utility-cmd
+   learning-path/index
 
 .. include:: ../../../_includes/contact_info.rst

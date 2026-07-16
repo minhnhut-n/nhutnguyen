@@ -44,6 +44,7 @@ về hệ thống nhúng, robot, và Linux.
    :hidden:
 
    self
+   docs_structure
    embedded_robot/index
    embedded_linux/index
    embedded_mcu/index

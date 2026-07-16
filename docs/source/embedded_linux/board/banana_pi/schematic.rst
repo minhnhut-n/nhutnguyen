@@ -54,6 +54,7 @@ Ví dụ: ``GPIO`` (General Purpose Input/Output), ``GSPI`` (General SPI).
   * **Đối với Mạch trong / Bên trong nguồn điện (Internal Circuit):**
     * **Dòng điện quy ước:** Đi từ cực Âm **-** sang cực Dương **+** để tạo thành một **vòng tuần hoàn kín**.
     * **Cơ chế:** Bên trong nguồn (pin/ắc quy), lực hóa học (lực lạ) thực hiện công để đẩy các điện tích ngược chiều điện trường, giúp duy trì hiệu điện thế. Khi phản ứng hóa học kết thúc (năng lượng giảm về 0) $\rightarrow$ Pin hết điện.
+
 ---
 
 .. rubric:: 3. Xung Nhịp & Tín Hiệu Điều Khiển (Clock & Control)
@@ -133,3 +134,5 @@ Cặp tín hiệu vi sai thường thấy trong ``pcie_<>`` (hậu tố của PC
 - `Banana Pi Official Website <https://www.banana-pi.org/>`_
 - `Banana Pi M4 Manual <https://wiki.banana-pi.org/Banana_Pi_BPI-M4>`_
 - `Reading Schematics Guide <https://learn.sparkfun.com/tutorials/how-to-read-a-schematic>`_
+
+.. include:: ../../../_includes/contact_info.rst

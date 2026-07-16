@@ -3,11 +3,6 @@ MCU General
 
 System design, kiến trúc tổng quan, thông tin chung về MCU.
 
-.. toctree::
-   :maxdepth: 1
-   :caption: MCU General
-   :glob:
-
-   *
+Các bài viết tổng quan sẽ được bổ sung dần theo từng dòng MCU và kiến trúc.
 
 .. include:: ../../_includes/contact_info.rst

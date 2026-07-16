@@ -3,11 +3,6 @@ Robot Theory
 
 Lý thuyết nền tảng: kinematics, dynamics, control theory, ...
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Robot Theory
-   :glob:
-
-   *
+Các bài viết nền tảng sẽ được thêm vào để nối kết lý thuyết với thực hành.
 
 .. include:: ../../_includes/contact_info.rst
