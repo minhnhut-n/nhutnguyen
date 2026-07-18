@@ -9,6 +9,6 @@ Tài liệu về vi điều khiển **ESP32** — Wi-Fi, Bluetooth, GPIO, ...
    :titlesonly:
    :glob:
 
-   station_client.rst
+   station_ap_connect_mode.rst
 
 .. include:: ../../../_includes/contact_info.rst
