@@ -1,4 +1,4 @@
-Utility Commands
+3. Utility Commands
 =============================================================================
 
 .. rubric:: Giới thiệu
@@ -200,5 +200,3 @@ Tổng hợp các câu lệnh hữu ích cho hệ thống Linux nhúng (Embedded
 
 - `Linux man pages <https://man7.org/linux/man-pages/>`_
 - `Ubuntu man pages <https://manpages.ubuntu.com/>`_
-
-.. include:: ../../../_includes/contact_info.rst

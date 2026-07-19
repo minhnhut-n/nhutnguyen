@@ -1,5 +1,5 @@
-Station & Access Point Connect
-==============================
+1. Station & Access Point Connect
+=================================
 
 Hướng dẫn cấu hình esp32 hoạt động trong hai chế độ STA và AP, ngoài ra còn hướng dẫn quá trình chuyển đổi
 mode giữa hai chế độ.
@@ -236,7 +236,7 @@ Main code:
 
 Log
 
-.. code-block:: bash
+.. code-block:: text
 
     I (701) ESP_WIFI_C: wifi as AP START!
     I (3701) wifi:flush txq

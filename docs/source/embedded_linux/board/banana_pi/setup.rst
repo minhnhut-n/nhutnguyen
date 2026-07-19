@@ -1,4 +1,4 @@
-Setup
+2. Setup
 =============================================================================
 
 .. rubric:: Yêu cầu phần cứng
@@ -203,7 +203,3 @@ Login with your user credentials.
 .. note::
 
    Replace ``aelius`` with your actual username and ``<board-ip-address>`` with the IP of your Banana Pi board.
-
----
-
-.. include:: ../../../_includes/contact_info.rst

@@ -1,4 +1,4 @@
-Schematics
+1. Schematics
 =============================================================================
 
 .. rubric:: 1. Quy Ước Đặt Tên & Ký Hiệu Cơ Bản
@@ -134,5 +134,3 @@ Cặp tín hiệu vi sai thường thấy trong ``pcie_<>`` (hậu tố của PC
 - `Banana Pi Official Website <https://www.banana-pi.org/>`_
 - `Banana Pi M4 Manual <https://wiki.banana-pi.org/Banana_Pi_BPI-M4>`_
 - `Reading Schematics Guide <https://learn.sparkfun.com/tutorials/how-to-read-a-schematic>`_
-
-.. include:: ../../../_includes/contact_info.rst

@@ -7,9 +7,7 @@ Tài liệu về Banana Pi boards.
    :maxdepth: 2
    :caption: Banana Pi
 
-   setup
    schematic
+   setup
    utility-cmd
    learning-path/index
-
-.. include:: ../../../_includes/contact_info.rst
