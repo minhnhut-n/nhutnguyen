@@ -8,5 +8,3 @@ Các board cụ thể: STM32, ESP32, AVR, PIC, ...
    :caption: MCU Boards
 
    esp32/index
-
-.. include:: ../../_includes/contact_info.rst

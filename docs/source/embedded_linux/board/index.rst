@@ -8,5 +8,3 @@ Các board cụ thể: Raspberry Pi, Banana Pi M4, BeagleBone, ...
    :caption: Linux Boards
 
    banana_pi/index
-
-.. include:: ../../_includes/contact_info.rst

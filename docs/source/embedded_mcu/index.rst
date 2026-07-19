@@ -35,5 +35,3 @@ Tài liệu và ghi chú về **vi điều khiển (MCU)**.
    general/index
    board/index
    helper/index
-
-.. include:: ../_includes/contact_info.rst

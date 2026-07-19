@@ -35,5 +35,3 @@ Tài liệu và ghi chú về **Embedded Linux**.
    general/index
    board/index
    services/index
-
-.. include:: ../_includes/contact_info.rst

@@ -11,5 +11,3 @@ Chủ đề này sẽ được mở rộng dần với nội dung về kernel, d
    :titlesonly:
 
    learning-path/index
-
-.. include:: ../../_includes/contact_info.rst
