@@ -35,5 +35,3 @@ Tài liệu và ghi chú về **robot và hệ thống điều khiển robot**.
    type/index
    controller/index
    theory/index
-
-.. include:: ../_includes/contact_info.rst
