@@ -1,5 +1,5 @@
-Banana Pi Learning Path
-=======================
+4. Banana Pi Learning Path
+===========================
 
 Nội dung học tập dành riêng cho Banana Pi M4 board.
 
