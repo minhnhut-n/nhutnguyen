@@ -177,7 +177,167 @@ Tổng hợp các câu lệnh hữu ích cho hệ thống Linux nhúng (Embedded
 
 ---
 
-.. rubric:: 10. Debug & Phân tích
+.. rubric:: 10. Disk (Định dạng & Mount ổ đĩa với fdisk)
+
+.. code-block:: bash
+
+   # -----------------------------------------------------------
+   # 1. Xem danh sách ổ đĩa
+   # -----------------------------------------------------------
+   lsblk                     # Xem cây block devices
+   fdisk -l                  # Xem chi tiết partition table
+   blkid                     # Xem UUID và filesystem type
+
+   # -----------------------------------------------------------
+   # 2. Phân vùng ổ đĩa với fdisk
+   # -----------------------------------------------------------
+   # Mở fdisk cho device (vd: /dev/sda, /dev/mmcblk0)
+   sudo fdisk /dev/sda
+
+   # Các lệnh trong fdisk:
+   #   m    - Xem help
+   #   p    - In partition table
+   #   n    - Tạo partition mới
+   #   d    - Xóa partition
+   #   t    - Đổi type partition (Linux=83, FAT32=b, Swap=82)
+   #   w    - Ghi thay đổi và thoát
+   #   q    - Thoát không lưu
+
+   # Ví dụ: Tạo 2 partition trên SD card 8GB (/dev/mmcblk0)
+   # Bước 1: Mở fdisk
+   sudo fdisk /dev/mmcblk0
+
+   # Bước 2: Xoá partition cũ (nếu có)
+   #   Lệnh: d
+   #   Lặp lại nếu có nhiều partition
+
+   # Bước 3: Tạo partition 1 - FAT32 (boot, 64MB)
+   #   Lệnh: n → p (primary) → 1 → (enter) → +64M
+   #   Lệnh: t → b (W95 FAT32)
+
+   # Bước 4: Tạo partition 2 - Linux (rootfs, phần còn lại)
+   #   Lệnh: n → p → 2 → (enter) → (enter)
+   #   Lệnh: t → 2 → 83 (Linux)
+
+   # Bước 5: Ghi lại
+   #   Lệnh: w
+
+   # Xác nhận sau khi ghi:
+   sudo fdisk -l /dev/mmcblk0
+
+   # -----------------------------------------------------------
+   # 3. Định dạng filesystem (format)
+   # -----------------------------------------------------------
+   # Định dạng ext4 (cho rootfs)
+   sudo mkfs.ext4 /dev/mmcblk0p2
+
+   # Định dạng FAT32 (cho boot partition)
+   sudo mkfs.vfat -F 32 /dev/mmcblk0p1
+
+   # Định dạng NTFS (dùng cho USB HDD tương thích Windows)
+   sudo mkfs.ntfs /dev/sda1
+
+   # Định dạng Swap
+   sudo mkswap /dev/mmcblk0p3
+   sudo swapon /dev/mmcblk0p3   # Bật swap ngay lập tức
+
+   # Định dạng nhanh (không kiểm tra bad block)
+   sudo mkfs.ext4 -F /dev/mmcblk0p2
+
+   # Định dạng với label
+   sudo mkfs.ext4 -L rootfs /dev/mmcblk0p2
+   sudo mkfs.vfat -F 32 -n BOOT /dev/mmcblk0p1
+
+   # -----------------------------------------------------------
+   # 4. Mount ổ đĩa
+   # -----------------------------------------------------------
+   # Mount thủ công
+   sudo mount /dev/mmcblk0p2 /mnt
+   sudo mount /dev/mmcblk0p1 /mnt/boot
+
+   # Mount với options tối ưu cho embedded
+   sudo mount -o noatime,nodiratime,data=writeback /dev/mmcblk0p2 /mnt
+
+   # Mount tất cả partition trong fstab
+   sudo mount -a
+
+   # Mount với UUID (tránh lỗi khi device name thay đổi)
+   sudo mount UUID=abc123... /mnt
+
+   # Unmount
+   sudo umount /mnt
+
+   # -----------------------------------------------------------
+   # 5. Cấu hình /etc/fstab (tự động mount khi boot)
+   # -----------------------------------------------------------
+   # Mẫu /etc/fstab cho Banana Pi boot từ SD card:
+   #
+   # <device>       <mount>   <type>  <options>          <dump> <pass>
+   /dev/mmcblk0p1  /boot     vfat    defaults            0      2
+   /dev/mmcblk0p2  /         ext4    defaults,noatime    0      1
+   tmpfs           /tmp      tmpfs   defaults,size=64M   0      0
+   tmpfs           /var/log  tmpfs   defaults,size=16M   0      0
+
+   # Dùng UUID thay vì device name (bền vững hơn)
+   # Lấy UUID:
+   sudo blkid /dev/mmcblk0p2
+   # Output: /dev/mmcblk0p2: UUID="a1b2c3d4-..." TYPE="ext4"
+
+   # /etc/fstab với UUID:
+   # UUID=a1b2c3d4-... / ext4 defaults,noatime 0 1
+
+   # -----------------------------------------------------------
+   # 6. Kiểm tra & sửa lỗi filesystem
+   # -----------------------------------------------------------
+   # Kiểm tra lỗi (unmount trước khi chạy)
+   sudo umount /dev/mmcblk0p2
+   sudo fsck.ext4 -f /dev/mmcblk0p2
+
+   # Kiểm tra nhanh
+   sudo fsck -N /dev/mmcblk0p2  # Chỉ xem, không sửa
+   sudo fsck -y /dev/mmcblk0p2  # Tự động trả lời yes
+
+   # -----------------------------------------------------------
+   # 7. Script tự động format và mount (cho SD card mới)
+   # -----------------------------------------------------------
+   # format_sd.sh - Chạy trên host PC
+   # #!/bin/bash
+   # DEV=/dev/mmcblk0
+   #
+   # echo "=== Xoá partition cũ ==="
+   # sudo dd if=/dev/zero of=$DEV bs=1M count=10
+   #
+   # echo "=== Tạo partition ==="
+   # sudo fdisk $DEV <<EOF
+   # n
+   # p
+   # 1
+   # 
+   # +64M
+   # t
+   # b
+   # n
+   # p
+   # 2
+   # 
+   # 
+   # w
+   # EOF
+   #
+   # echo "=== Format ==="
+   # sudo mkfs.vfat -F 32 -n BOOT ${DEV}p1
+   # sudo mkfs.ext4 -L rootfs ${DEV}p2
+   #
+   # echo "=== Mount ==="
+   # sudo mount ${DEV}p2 /mnt
+   # sudo mkdir -p /mnt/boot
+   # sudo mount ${DEV}p1 /mnt/boot
+   #
+   # echo "Done! Rootfs mounted at /mnt, boot at /mnt/boot"
+
+---
+
+.. rubric:: 11. Debug & Phân tích
 
 .. code-block:: bash
 
