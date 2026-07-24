@@ -139,7 +139,84 @@ Tổng hợp các câu lệnh hữu ích cho hệ thống Linux nhúng (Embedded
 
 ---
 
-.. rubric:: 8. Kernel (Quản lý module nhân)
+.. rubric:: 8. Samba (Chia sẻ file qua mạng)
+
+.. code-block:: bash
+
+   # -----------------------------------------------------------
+   # 1. Cài đặt Samba
+   # -----------------------------------------------------------
+   sudo apt-get update
+   sudo apt-get install samba samba-common-bin -y
+
+   # -----------------------------------------------------------
+   # 2. Cấu hình Samba - share thư mục
+   # -----------------------------------------------------------
+   # Backup config gốc
+   sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak
+
+   # Sửa file cấu hình Samba
+   sudo nano /etc/samba/smb.conf
+
+   # Thêm nội dung sau vào cuối file để share thư mục:
+   #
+   # [share]
+   #    comment = Shared Folder
+   #    path = /home/pi/share
+   #    browseable = yes
+   #    read only = no
+   #    guest ok = no
+   #    create mask = 0755
+   #    directory mask = 0755
+   #    valid users = pi
+
+   # Tạo thư mục share (nếu chưa có)
+   mkdir -p /home/pi/share
+   sudo chmod 755 /home/pi/share
+
+   # -----------------------------------------------------------
+   # 3. Đặt mật khẩu Samba (bắt buộc)
+   # -----------------------------------------------------------
+   # Tạo user Samba (dùng user Linux đã có, vd: pi)
+   sudo smbpasswd -a pi
+   # Nhập mật khẩu khi được yêu cầu (2 lần)
+
+   # Bật Samba user
+   sudo smbpasswd -e pi
+
+   # -----------------------------------------------------------
+   # 4. Khởi động lại Samba
+   # -----------------------------------------------------------
+   sudo systemctl restart smbd
+   sudo systemctl restart nmbd
+
+   # Kiểm tra trạng thái Samba
+   sudo systemctl status smbd
+   sudo systemctl status nmbd
+
+   # Bật Samba tự động khởi động cùng hệ thống
+   sudo systemctl enable smbd
+   sudo systemctl enable nmbd
+
+   # -----------------------------------------------------------
+   # 5. Kiểm tra share từ máy Windows/Linux
+   # -----------------------------------------------------------
+   # Xem danh sách share đang chạy
+   smbclient -L localhost -U pi
+
+   # Từ máy Windows, mở File Explorer và gõ:
+   # \\192.168.1.100\share
+   # (thay 192.168.1.100 bằng IP của board)
+
+   # Từ máy Linux, mount Samba share:
+   sudo mount -t cifs //192.168.1.100/share /mnt -o username=pi
+
+   # Xem log Samba nếu gặp lỗi
+   sudo journalctl -u smbd -b
+
+---
+
+.. rubric:: 9. Kernel (Quản lý module nhân)
 
 .. code-block:: bash
 
@@ -163,7 +240,7 @@ Tổng hợp các câu lệnh hữu ích cho hệ thống Linux nhúng (Embedded
 
 ---
 
-.. rubric:: 9. USB & I2C
+.. rubric:: 10. USB & I2C
 
 .. code-block:: bash
 
@@ -177,7 +254,7 @@ Tổng hợp các câu lệnh hữu ích cho hệ thống Linux nhúng (Embedded
 
 ---
 
-.. rubric:: 10. Disk (Định dạng & Mount ổ đĩa với fdisk)
+.. rubric:: 11. Disk (Định dạng & Mount ổ đĩa với fdisk)
 
 .. code-block:: bash
 
@@ -337,7 +414,7 @@ Tổng hợp các câu lệnh hữu ích cho hệ thống Linux nhúng (Embedded
 
 ---
 
-.. rubric:: 11. Debug & Phân tích
+.. rubric:: 12. Debug & Phân tích
 
 .. code-block:: bash
 
