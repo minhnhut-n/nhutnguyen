@@ -1,10 +1,6 @@
 Level 2 – Embedded Linux
 ========================
 
-Board của bạn rất phù hợp cho việc học embedded Linux vì Banana Pi sử dụng
-Allwinner SoC, có đầy đủ các khối ngoại vi như GPIO, UART, I2C, SPI, Ethernet
-và quan trọng nhất là tài liệu open-source rất phong phú.
-
 Boot
 ----
 
@@ -26,6 +22,15 @@ BootROM là một đoạn code nhỏ được nhà sản xuất SoC (System-on-C
 vào ROM (Read-Only Memory) của chip. Nó là thứ đầu tiên chạy khi bạn cấp
 nguồn cho board. Nhiệm vụ chính là xác định boot device (SD card, eMMC,
 NAND Flash, UART, USB,...) và load SPL vào SRAM.
+
+Có hai dạng Boot ROM:
+
+- **Mask Boot ROM**: Được ghi cứng vào chip tại nhà máy, không thể thay đổi.
+- **Writable Boot ROM**: Có thể ghi lại (EEPROM, eMMC,...), cho phép cập nhật
+  firmware boot sau này.
+
+Boot ROM sẽ đặt các init code của từng peripheral device (storage device,...)
+vào một vùng nhớ cố định ngay lập tức để CPU có thể thực thi.
 
 .. code-block:: bash
 
@@ -52,14 +57,32 @@ SPL là bootloader giai đoạn 2, được load bởi BootROM vào SRAM (vì DR
 
 **3. U-Boot (Universal Bootloader)**
 
-U-Boot là bootloader phổ biến nhất trong thế giới embedded Linux. Nó là một
-"mini OS" có shell riêng, cho phép bạn tương tác trước khi kernel được load.
+U-Boot, nguyên gốc là Das-Uboot, là một bootloader open-source được sử dụng
+rộng rãi nhất trong thế giới embedded Linux. Nó là một "mini OS" có shell
+riêng, cho phép bạn tương tác trước khi kernel được load.
+
+U-Boot là code được chạy trong 1st stage hoặc 2nd stage của bootloader,
+được load bởi system ROM từ các thiết bị ngoại vi có thể dùng làm boot
+như SD Card, SATA, Flash.
+
+Code U-Boot có thể chia thành 2 stage: First và Second Program Loader (SPL).
+Nguyên nhân là do có thể không đủ hoặc giới hạn phần cứng để load hết vào
+1 stage. Ví dụ, để khởi tạo DRAM (RAM chính), ban đầu nó sẽ sử dụng CPU
+cache làm RAM tạm thời trước khi DRAM được khởi tạo.
+
 U-Boot làm các nhiệm vụ sau:
 
 - Khởi tạo hardware (Ethernet, MMC, USB,...)
 - Đọc Device Tree và Kernel từ storage
 - Cung cấp môi trường (environment) để cấu hình boot parameters
 - Load và jump vào kernel
+
+.. note::
+
+   Chuẩn boot phổ biến trên máy tính hiện đại là UEFI, được định nghĩa trong
+   Embedded Base Boot Requirements. UEFI là một binary interface giống với
+   GRUB hay Linux kernel, được load/boot thông qua boot manager dưới dạng
+   CLI. Trong khi đó, U-Boot là giải pháp đặc thù cho embedded Linux.
 
 .. code-block:: bash
 
@@ -129,6 +152,13 @@ phần mô tả hardware ra khỏi kernel code.
 Device Tree compiler (DTC) sẽ biên dịch ``.dts`` thành ``.dtb`` (binary).
 Kernel đọc ``.dtb`` để biết nó đang chạy trên hardware nào và khởi tạo driver
 tương ứng.
+
+.. warning::
+
+   Việc viết Device Tree sai hoặc thiếu có thể dẫn đến các vấn đề nghiêm trọng:
+   nếu nhẹ thì mất cấu hình Wi-Fi, RAM thiếu, peripheral không hoạt động; nặng
+   thì brick device, không boot được (no boot load). Vì vậy, luôn kiểm tra kỹ
+   Device Tree trước khi flash xuống board.
 
 .. code-block:: bash
 
