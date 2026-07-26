@@ -7,5 +7,5 @@ ESP Dashboard Control and Monitoring
    :titlesonly:
    :glob:
 
-   Firmware_Architecture_Specification
-   Current_Problems_and_Migration_Plan
+   docs_design/index
+   docs_implement/index

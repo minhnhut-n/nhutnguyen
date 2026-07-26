@@ -1,4 +1,4 @@
-3. GPIO Control
+4. GPIO Control
 ===============
 
 .. rubric:: Tổng quan

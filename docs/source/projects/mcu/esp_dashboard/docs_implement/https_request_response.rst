@@ -1,4 +1,4 @@
-2. HTTP Structure and Communication
+HTTP Structure and Communication
 ===================================
 
 .. rubric:: Tổng quan

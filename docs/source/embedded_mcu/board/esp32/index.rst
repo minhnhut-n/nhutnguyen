@@ -8,6 +8,6 @@ ESP32
    :glob:
 
    station_ap_connect_mode.rst
-   https_request_response.rst
+   general_http_req_resp.rst
+   event_driven_structure.rst
    gpio_control.rst
-   docs/index.rst

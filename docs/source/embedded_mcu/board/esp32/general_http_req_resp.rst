@@ -1,7 +1,7 @@
 .. _general-http-req-resp:
 
 ========================================
-Tổng Quan Về HTTP Request & Response
+2. HTTP Request & Response
 ========================================
 
 .. rubric:: I. Tổng Quan Về Mô Hình Client - Server
