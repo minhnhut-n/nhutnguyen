@@ -49,7 +49,7 @@ html_theme_options = {
     'collapse_navigation': False,
     'sticky_navigation': True,
     'includehidden': True,
-    'titles_only': False,
+    'titles_only': True,
 }
 
 suppress_warnings = ['myst.header']

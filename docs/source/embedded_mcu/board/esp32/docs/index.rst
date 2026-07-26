@@ -10,5 +10,3 @@ Tài liệu tổng quát về cách vận hành, tường minh một system
    :glob:
 
    general_http_req_resp.rst
-
-.. include:: ../../../../_includes/contact_info.rst

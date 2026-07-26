@@ -9,6 +9,5 @@ ESP32
 
    station_ap_connect_mode.rst
    https_request_response.rst
+   gpio_control.rst
    docs/index.rst
-
-.. include:: ../../../_includes/contact_info.rst
