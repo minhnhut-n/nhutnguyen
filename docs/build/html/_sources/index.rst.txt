@@ -55,6 +55,7 @@ về hệ thống nhúng, robot, và Linux.
    embedded_linux/index
    embedded_mcu/index
    programming/index
+   architecture/index
    projects/index
 
 .. include:: _includes/contact_info.rst

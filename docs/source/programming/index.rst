@@ -6,12 +6,12 @@ Tài liệu và ghi chú về **lập trình, thuật toán và hệ thống nh�
 .. grid:: 1
    :gutter: 3
 
-   .. grid-item-card:: 📖 Algorithms
-      :link: algorithms/index
+   .. grid-item-card:: 👨‍💼 Design architecture
+      :link: architecture/index
       :link-type: doc
       :class-card: sd-shadow-md
 
-      Thuật toán, phân tích độ phức tạp và giải pháp lập trình.
+      Kiến trúc thiết kế, nguyên tắc và best practices.
 
    .. grid-item-card:: 🛠️ Programming Languages
       :link: programming_language/index
@@ -19,6 +19,13 @@ Tài liệu và ghi chú về **lập trình, thuật toán và hệ thống nh�
       :class-card: sd-shadow-md
 
       Ngôn ngữ lập trình, cú pháp, kiểu dữ liệu và paradigms.
+
+   .. grid-item-card:: 📖 Algorithms
+      :link: algorithms/index
+      :link-type: doc
+      :class-card: sd-shadow-md
+
+      Thuật toán, phân tích độ phức tạp và giải pháp lập trình.
 
    .. grid-item-card:: 📚 Data Structures
       :link: data_structure/index
@@ -32,6 +39,7 @@ Tài liệu và ghi chú về **lập trình, thuật toán và hệ thống nh�
    :caption: Programming & Algorithms
    :hidden:
 
-   algorithms/index
+   architecture/index
    programming_language/index
+   algorithms/index
    data_structure/index
