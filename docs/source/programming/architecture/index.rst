@@ -11,3 +11,4 @@ Các nội dung chính bao gồm: kiến trúc phần mềm, design patterns, ng
 
    software_architecture
    vertical_event_driven_esp32
+   state_machine
