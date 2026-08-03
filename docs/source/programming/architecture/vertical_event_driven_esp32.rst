@@ -163,8 +163,11 @@ Slice này lắng nghe các sự kiện từ Event Bus. Khi nhận được EVEN
 
 .. rubric:: 7. Ưu Điểm Của Sự Kết Hợp Trên ESP32
 
-**Tiêu chí** | **Lợi ích trên ESP32**
---- | ---
-**Loose Coupling (Mất Phụ Thuộc)** | Nếu bạn gỡ bỏ Slice 1 (Nhiệt độ), Slice 2 (Nút/LED) vẫn biên dịch và hoạt động bình thường mà không bị lỗi thiếu hàm hay thiếu thư viện.
-**Tận Dụng Dual-Core ESP32** | Mỗi Vertical Slice có thể chạy trên một Task RTOS riêng biệt (Task Temp ở Core 1, Task Radio/Network ở Core 0) mà không lo tranh chấp tài nguyên nhờ Event Bus.
-**Dễ Dàng Mở Rộng** | Muốn thêm Slice 3 (Gửi tin nhắn MQTT lên Cloud)? Chỉ cần viết Slice 3 và đăng ký lắng nghe EVENT_TEMP_OVERHEAT mà không cần sửa 1 dòng code nào trong Slice 1 hay Slice 2.
+**Loose Coupling (Mất Phụ Thuộc)**
+   Nếu bạn gỡ bỏ Slice 1 (Nhiệt độ), Slice 2 (Nút/LED) vẫn biên dịch và hoạt động bình thường mà không bị lỗi thiếu hàm hay thiếu thư viện.
+
+**Tận Dụng Dual-Core ESP32**
+   Mỗi Vertical Slice có thể chạy trên một Task RTOS riêng biệt (Task Temp ở Core 1, Task Radio/Network ở Core 0) mà không lo tranh chấp tài nguyên nhờ Event Bus.
+
+**Dễ Dàng Mở Rộng**
+   Muốn thêm Slice 3 (Gửi tin nhắn MQTT lên Cloud)? Chỉ cần viết Slice 3 và đăng ký lắng nghe EVENT_TEMP_OVERHEAT mà không cần sửa 1 dòng code nào trong Slice 1 hay Slice 2.

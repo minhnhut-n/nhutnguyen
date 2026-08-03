@@ -1,0 +1,19 @@
+/* Add spacing between grid item cards on the home page */
+.sd-grid-item {
+    margin-bottom: 1.5rem;
+}
+
+.sd-card {
+    margin-bottom: 1rem;
+}
+
+/* Ensure proper spacing in 2-column grid */
+@media (min-width: 768px) {
+    .sd-grid {
+        gap: 1.5rem;
+    }
+    
+    .sd-grid-item {
+        margin-bottom: 0;
+    }
+}
