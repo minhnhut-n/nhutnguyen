@@ -1,4 +1,4 @@
-Bài 1: Object Pattern trong Lập Trình C
+[UDEMY] Object Pattern trong Lập Trình C
 ========================================
 
 .. role:: bolditalic

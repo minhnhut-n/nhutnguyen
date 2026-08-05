@@ -58,9 +58,9 @@ về hệ thống nhúng, robot, và Linux.
    :hidden:
 
    self
+   english_blog/index
    embedded_robot/index
    embedded_linux/index
-   english_blog/index
    embedded_mcu/index
    programming/index
    projects/index
