@@ -31,6 +31,13 @@ về hệ thống nhúng, robot, và Linux.
 
       Bare-metal, RTOS, STM32, ESP32, AVR, and low-level firmware.
 
+   .. grid-item-card:: 📝 English Blog
+      :link: english_blog/index
+      :link-type: doc
+      :class-card: sd-shadow-md
+
+      Blog posts and articles in English about technology and programming.
+
    .. grid-item-card:: 🧠 Programming & Algorithms
       :link: programming/index
       :link-type: doc
@@ -53,6 +60,7 @@ về hệ thống nhúng, robot, và Linux.
    self
    embedded_robot/index
    embedded_linux/index
+   english_blog/index
    embedded_mcu/index
    programming/index
    projects/index
