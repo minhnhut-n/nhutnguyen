@@ -5,7 +5,6 @@ Tiếp Cận Theo Ngôn Ngữ Học Tri Nhận (Cognitive Linguistics)
 -------------------------------------------------------------
 
 Khi học giới từ trong tiếng Anh, thay vì học thuộc lòng danh sách lý thuyết suông, cách tiếp cận theo **Ngôn ngữ học Tri nhận (Cognitive Linguistics)** giúp chúng ta hiểu được tư duy không gian và thời gian của người bản xứ.
-
 Bản chất của các giới từ **IN - ON - AT** dựa trên cách người nói cảm nhận về kích thước không gian (3D, 2D, 1D) và mức độ tương đối / tuyệt đối của thời gian.
 
 ----
@@ -129,8 +128,8 @@ Dùng khi coi vị trí như một **tọa độ / điểm mốc xác định** 
 4.2. Phân biệt ``at Christmas`` và ``on Christmas Day``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* **at Christmas:** Nói về **cả dịp/kỳ nghỉ Giáng Sinh** (thường kéo dài vài ngày quanh lễ).
-* **on Christmas Day:** Chỉ đích danh **đúng ngày lễ Giáng Sinh** (25/12).
+* **at Christmas:** Nói về **cả dịp/kỳ nghỉ Giáng Sinh** (thường kéo dài vài ngày quanh lễ), nằm trong usecase sử dụng của "at".
+* **on Christmas Day:** biến thành ngày nên sử dụng "on" như là giới từ thay vì "at".
 
 ----
 
