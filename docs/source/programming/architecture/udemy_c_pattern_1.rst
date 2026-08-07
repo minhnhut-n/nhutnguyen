@@ -577,6 +577,334 @@ Object Pattern là bước đầu tiên để viết code C chuyên nghiệp, sc
 
 ----
 
+5. C Object Design Principles Notes
+------------------------------------
+
+5.1. Avoiding Static Variables Inside Functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Question 1:** Why is it so important to avoid static variables inside functions in C? Especially if the function is an object method?
+
+**Static variables inside functions**
+
+- Tránh các hành vi thay đổi giá trị của biến một cách bất thường mà ta không kiểm soát được.
+
+- Bên cạnh đó, việc sử dụng các biến ``static`` làm mất đi tính **isolate**.
+
+- Cả hai object đều có thể tác động và thay đổi giá trị của ``static``.
+
+- Điều này làm mất tính module hóa.
+
+- Trạng thái của object là duy nhất, chứ không chia sẻ.
+
+**Object method considerations**
+
+Với function là một object method thì:
+
+- Thường được đặt tên với prefix là object đó.
+- Các thông số thường được truyền thông qua các parameter.
+
+Mục đích:
+
+- Đưa dữ liệu vào luồng xử lý.
+- Xử lý các mutex một cách hợp lý.
+
+Điều tối kị:
+
+- Cùng một function và cùng parameter truyền vào mà lại có 2 output khác nhau.
+- Điều này dẫn đến unwanted behavior ngầm.
+
+---
+
+5.2. Functions Without Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Question 2:** Why do we avoid functions without parameters? What negative property do these functions possess that make them a very bad design flaw in C source code?
+
+Function được build mà không có parameter:
+
+- Thậm chí không dùng parameter cũng vẫn nên truyền.
+- Nếu không cần thì optimize sau.
+
+Lý do:
+
+- Code không được tường minh.
+
+**Explicit context passing**
+
+Quy tắc:
+
+> Toàn bộ ngữ cảnh nên được truyền toàn bộ cho hàm thông qua các đối số để làm rõ, tường minh code.
+
+Những function có argument là ``void``:
+
+- Thường truy xuất các static variable.
+- Do đó khá phiền khi ta không biết đang xử lý trên object nào.
+
+---
+
+5.3. Object Function Design Questions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Key questions for object function design:**
+
+Thiết kế function object phải trả lời được các câu hỏi:
+
+**Which object does it work for?**
+
+- Object nào đang sở hữu function này?
+
+**Buffer allocation strategy**
+
+Cần xác định:
+
+- Resource ownership.
+- Lifetime của dữ liệu.
+
+**State changes**
+
+Cần biết:
+
+- Function tác động đến state nào.
+- Side effect nào xảy ra.
+
+**Required resources**
+
+Việc isolate các function giúp:
+
+- Dễ dàng tạo dummy object để test.
+- Dễ hơn so với các function phụ thuộc quá nhiều vào static variable.
+
+---
+
+5.4. Naming Context Pointer 'self'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Question 3:** Why do we call our pointer to context 'self'? Why should we avoid using other names to refer to 'self'?
+
+``self`` để nội ám chỉ rằng:
+
+- Cấu trúc dữ liệu là thuộc lớp design này.
+- Không được modify ở chỗ nào khác.
+
+Mang ý nghĩa giống như:
+
+- Private method trong C++.
+
+Nhưng khác:
+
+- Trong C++ có chức năng language-level.
+- Trong C chỉ là convention.
+
+**Naming convention**
+
+Chữ "should" thể hiện:
+
+- Nên sử dụng.
+- Không hẳn là bắt buộc.
+
+Việc sử dụng ``self`` giúp:
+
+- Người khác dễ hình dung workflow của cấu trúc dữ liệu.
+- Dễ maintain hơn.
+
+---
+
+5.5. Singleton Pattern in C
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Question 4:** Why is it sometimes necessary to instantiate objects locally in the C file as singletons?
+
+**Singleton definition**
+
+Singleton được giới thiệu như là một method giúp:
+
+- Tránh overlap các declaration ở nhiều nơi.
+- Khiến code khó kiểm soát.
+
+Tuy nhiên trong C:
+
+- Việc khai báo singleton có hơi khác một chút.
+
+Về cơ bản:
+
+- Chống misunderstanding giữa các bên khi sử dụng object.
+
+**Purpose of singleton**
+
+Mục đích sử dụng của singleton:
+
+- Dành cho các thông tin chỉ nên có một lần duy nhất trong suốt quá trình chạy (bật điện).
+
+Ví dụ:
+
+- System status.
+
+---
+
+5.6. Opaque Structures
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Question 5:** Why is it sometimes necessary to only expose a pointer to the data structure outside of the implementing C file?
+
+**Opaque structure pattern**
+
+Phổ biến khi:
+
+- Ta muốn ẩn các file implement vào trong file ``.c``.
+
+Trong file ``.h``:
+
+.. code-block:: c
+
+   typedef struct Timer Timer;
+
+Trong file ``.c``:
+
+.. code-block:: c
+
+   struct Timer
+   {
+
+   };
+
+**Purpose**
+
+Trong trường hợp này:
+
+- Ta chỉ muốn nhắc nhở rằng hãy sử dụng các hàm để set/get giá trị.
+- Thay vì can thiệp trực tiếp giá trị đó vào struct.
+
+**Benefits**
+
+**Encapsulation (tính đóng gói)**
+
+- Data được kiểm soát thông qua interface.
+
+**Information hiding**
+
+- User không cần biết internal implementation.
+
+**Giảm coupling**
+
+- Internal implementation có thể thay đổi.
+
+**User không thể modify trực tiếp data trong struct**
+
+Vì:
+
+- Không biết cấu trúc bên trong.
+
+Tuy nhiên:
+
+- Nếu biết thì vẫn có thể edit bình thường.
+
+**Memory allocation**
+
+Opaque object giúp:
+
+- Custom được memory allocation.
+
+Có thể kiểm soát:
+
+- Cách cấp phát memory.
+- Resource ownership.
+
+---
+
+5.7. Naming Conventions for Headers and C Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Question 6:** Why is it a good practice to always name the header and the C file with the same name as the data object they implement?
+
+**Naming convention**
+
+Để xác định:
+
+- Các object liên quan tới function.
+- Hỗ trợ trong refactor.
+- Hỗ trợ test code.
+
+**Separation benefits**
+
+Giúp:
+
+- Phân chia rõ ràng giữa method và instance.
+
+Ví dụ:
+
+Object:
+
+::
+
+   Timer
+
+File:
+
+::
+
+   Timer.h
+   Timer.c
+
+---
+
+5.8. Avoiding 'extern' Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Question 7:** Why should you never use 'extern' declared variables anywhere in your C code?
+
+**Avoid extern mutable state**
+
+Không nên expose mutable module state thông qua:
+
+.. code-block:: c
+
+   extern
+
+variables.
+
+**Problem**
+
+Khi sử dụng:
+
+.. code-block:: c
+
+   extern variable
+
+thì:
+
+- Bất kỳ module nào cũng có thể thay đổi giá trị.
+- Khó kiểm soát ai đang modify state.
+
+**Better approach**
+
+Prefer:
+
+- Functions.
+- Object interfaces.
+
+Để:
+
+- Access đến state được kiểm soát.
+- Giữ được module boundary.
+
+---
+
+5.9. Core Design Principles
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Essential principles:**
+
+- Avoid hidden state.
+- Keep object state unique.
+- Maintain isolation.
+- Pass context explicitly.
+- Hide implementation details.
+- Reduce coupling.
+- Control access to mutable data.
+
+----
+
 References
 ----------
 
