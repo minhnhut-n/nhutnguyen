@@ -8,6 +8,4 @@ Các project về Edge AI, TinyML, Machine Learning trên hệ thống nhúng.
    :caption: AI Projects
    :glob:
 
-   *
-
 .. include:: ../../_includes/contact_info.rst

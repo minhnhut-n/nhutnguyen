@@ -1,9 +1,8 @@
 Linux General
 =============
 
-Phân tích mã nguồn Linux, kiến trúc kernel, ...
-
-Chủ đề này sẽ được mở rộng dần với nội dung về kernel, drivers, build system và debugging.
+Lộ trình học **Embedded Linux** (Learning Path) cùng các tài liệu phân tích
+mã nguồn Linux, kiến trúc kernel, ...
 
 .. toctree::
    :maxdepth: 1

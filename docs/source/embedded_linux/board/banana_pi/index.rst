@@ -11,4 +11,3 @@ Tài liệu về Banana Pi boards.
    setup
    utility-cmd
    hardware-capabilities
-   learning-path/index
