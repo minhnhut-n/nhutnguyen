@@ -197,7 +197,7 @@ Về cơ bản, với từng mốc theo đường chéo, thuật toán BFS sẽ 
    +---------------------------------------+
 
 ===============================================================================
-thuật toán tìm kiem theo chiều sâu (depth-first search - DFS)
+Thuật toán tìm kiếm theo chiều sâu (Depth-First Search - DFS)
 ===============================================================================
 
 1. Tổng quan về Thuật toán DFS

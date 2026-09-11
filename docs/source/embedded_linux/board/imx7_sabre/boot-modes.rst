@@ -16,228 +16,267 @@
 Tổng quan các chế độ Boot
 =========================
 
-i.MX 7Dual có **Boot ROM** tích hợp sẵn. Khi board reset, ROM sẽ đọc trạng
-thái của **Boot Mode Switches (SW6)** và eFuse để quyết định phương thức
-boot. Trên SabreSD, **SW6** là công tắc DIP 4-bit.
+Board **i.MX 7Dual SabreSD** tích hợp nhiều **boot mode**, mỗi chế độ nạp
+boot image từ một nguồn lưu trữ khác nhau. Việc chọn boot mode được cấu hình
+hoàn toàn bằng **phần cứng**, thông qua các công tắc DIP trên board:
 
-.. list-table:: **Cấu hình SW6 (Boot Mode Switch) trên SabreSD**
-   :widths: 20 30 50
-   :header-rows: 1
-
-   * - SW6[4:1]
-     - Chế độ boot
-     - Mô tả
-   * - ``0000``
-     - **FlexSPI / QSPI NOR**
-     - Boot từ QSPI NOR Flash 16MB (chứa M4 firmware/backup bootloader)
-   * - ``0010``
-     - **Serial Download (SDP)**
-     - ROM chờ lệnh từ USB OTG — dùng để **flash image** qua UUU/mfgtools
-   * - ``0011``
-     - **eMMC (USDHC3)**
-     - Boot từ eMMC nội bộ
-   * - ``0100``
-     - **SD Card (USDHC1)**
-     - Boot từ thẻ microSD (slot phía dưới board)
+* ``SW1`` — công tắc chọn **nguồn boot** (boot source).
+* ``SW2``, ``SW3`` — hai công tắc chọn **boot mode**.
 
 .. note::
-   Giá trị bit đọc theo thứ tự **SW6-4 SW6-3 SW6-2 SW6-1** (SW6-1 là bit
-   thấp nhất). Cần đối chiếu lại schematic SabreSD của bạn trước khi
-   thực hiện — bản REV C4 có thể khác chút về thứ tự.
+   Ký hiệu bit (``0``/``1``/``X``) được in **ngay cạnh từng công tắc** trên
+   bề mặt board (silk-screen). Hãy đối chiếu trực tiếp các ký hiệu này khi
+   gạt công tắc.
+
+Bảng dưới đây tổng hợp vị trí công tắc cho từng boot media — trích từ tài
+liệu chính thức của NXP:
+
+.. list-table:: **Table 1. Booting from SD1/J6 on i.MX7Dual Sabre-SD**
+   :widths: 30 40 30
+   :header-rows: 1
+   :align: center
+
+   * - Boot Media
+     - ``SW2`` [D1-D8]
+     - ``SW3`` [D1-D2]
+   * - SD card (``SD1``)
+     - ``00100000``
+     - ``10``
+   * - eMMC
+     - ``01010000``
+     - ``10``
+   * - NAND
+     - ``011XXXX0``
+     - ``10``
+   * - QuadSPI
+     - ``10000000``
+     - ``10``
+   * - SDP (Serial Download)
+     - ``XXXXXXXX``
+     - ``01``
+
+.. tip::
+   Nguồn tham khảo chính thức: `Getting Started with the MCIMX7SABRE (NXP)
+   <https://www.nxp.com/document/guide/getting-started-with-the-mcimx7sabre:GS-MCIMX7SABRE?section=out-of-the-box&subSection=out-of-the-box-5>`_
 
 ---
 
 Chế độ 1: Boot từ SD Card
 =========================
 
-**Mục đích:** Chạy U-Boot + Linux từ thẻ microSD (dùng cho development).
+**Mục đích:** chạy **U-Boot + Linux** từ thẻ microSD — chế độ phổ biến nhất
+trong giai đoạn **development**.
 
-Các bước:
----------
-1. **Chuẩn bị SD card** — ghi bootloader ra đúng offset của ROM:
+Chuẩn bị
+--------
+
+.. list-table:: **Danh mục chuẩn bị**
+   :widths: 22 28 50
+   :header-rows: 1
+
+   * - Hạng mục
+     - Yêu cầu
+     - Chi tiết
+   * - **Thẻ microSD**
+     - Tối thiểu **8 GB**
+     - Ghi sẵn **image Yocto** hoặc **image nhà sản xuất cung cấp** (thường
+       là kernel ``4.14``, image chỉ chiếm **< 1 GB**)
+   * - **Console UART**
+     - ``115200 8N1``
+     - Cắm vào **cổng DEBUG UART** trên board. Trên PC là ``COM14`` (hoặc
+       cổng COM tương ứng — nhận diện qua **LED chỉ thị** sáng cạnh dòng
+       chữ *UART debug* khi cắm cáp)
+   * - **Nguồn cấp**
+     - **5V DC, 2-4 A**
+     - Dòng đủ lớn để boot chắc chắn; nếu muốn dư dả headroom thì dùng luôn
+       **5V/5 A** (adapter đi kèm kit NXP)
+
+Các bước thực hiện
+------------------
+
+#. **Ghi image vào thẻ microSD** — flash image Yocto hoặc image NXP vào
+   thẻ.
 
    .. code-block:: bash
 
-      # u-boot-imx build với mx7dsabresd_defconfig
-      sudo dd if=u-boot-dtb.imx of=/dev/sdX bs=1k seek=1 conv=fsync
+      # Ví dụ trên Linux — thay sdX bằng device của thẻ SD
+      $ dd if=<image>.wic of=/dev/sdX bs=1M status=progress conv=fsync
 
-   .. warning::
-      i.MX7 ROM đọc bootloader từ offset **1KB** của media. Không dùng
-      ``seek=0`` như các SoC khác.
+   Trên Windows có thể dùng *balenaEtcher* hoặc *Win32DiskImager*.
 
-2. Tạo phân vùng và ghi rootfs (rootfs.ext4 hoặc rootfs.tar giải nén).
-
-3. **Cài SW6 về chế độ SD:**
+#. **Cấu hình công tắc boot** theo **Table 1**:
 
    .. code-block:: text
 
-      SW6 = [OFF ON OFF OFF]   # 0100 — boot từ USDHC1 (SD)
+      SD card (SD1):  SW2 = 00100000 | SW3 = 10
 
-4. Kết nối **serial console** vào debug UART (J24), terminal
-   ``115200 8N1`` rồi reset board.
+#. **Gắn thẻ microSD** vào slot **SD1 (J6)**.
 
-5. Quan sát output U-Boot:
+#. **Kết nối UART debug** với PC, mở terminal (*PuTTY* / *Tera Term*) với
+   cấu hình ``115200 8N1`` trên cổng COM đã xác định ở phần chuẩn bị.
 
-   .. code-block:: text
+#. **Cấp nguồn 5V** cho board.
 
-      U-Boot 2020.04-imx_v2020.04
-      CPU:   Freescale i.MX7D rev1.2
-      Board: i.MX7D SABRESD
-      Boot:  SD1
-      Hit any key to stop autoboot:  3
+#. **Theo dõi log boot** trên terminal — chuỗi log đi qua
+   *BootROM → U-Boot → kernel*. Log in ra liên tục nghĩa là board đã boot
+   thành công từ SD.
+
+Lưu ý
+-----
+
+.. note::
+   Vị trí công tắc boot chỉ được BootROM đọc **tại thời điểm reset /
+   power-on**. Nếu đổi công tắc khi board đang chạy, cần power-cycle lại
+   để cấu hình mới có hiệu lực.
+
+.. warning::
+   Không tháo/phục thẻ microSD khi board đang cấp nguồn hoặc hệ thống đang
+   chạy *(thực tế không nghiêm trọng — chỉ là quy tắc nên tuân theo)*.
+
+   Trong quá trình vận hành có thể gặp trường hợp sau:
+   
+   * **Không boot được, log báo lỗi** ``1.8V power fail`` — nguồn cấp cho
+     thẻ SD không đủ. **Giải pháp:** dùng **adapter 5V/5A** hoặc **thẻ SD
+     khác**.
+
+     *Trường hợp thực tế:* lỗi xuất hiện khi nguồn chỉ **5V/3A** và thẻ SD
+     đời cũ (board để lâu không sử dụng, linh kiện có hiện tượng oxy hóa).
+     Dùng tạm **thẻ SD đời mới hơn** để boot mồi lần đầu — các lần boot
+     sau có thể dùng lại thẻ cũ bình thường.
 
 ---
 
 Chế độ 2: Boot từ eMMC
 ======================
 
-**Mục đích:** Boot từ bộ nhớ trong eMMC — production, không cần SD card.
+**Mục đích:** chạy **U-Boot + Linux** từ bộ nhớ **eMMC onboard** — không phụ
+thuộc thẻ SD rời.
 
-1. **Boot tạm từ SD hoặc USB** để có môi trường ghi eMMC, hoặc flash eMMC
-   từ PC qua Serial Download (xem Chế độ 3).
+Chuẩn bị
+--------
 
-2. Từ U-Boot, ghi bootloader vào eMMC (device ``mmc 1`` tương ứng eMMC):
+.. note::
+   **TODO:** bổ sung danh mục chuẩn bị (image, công cụ ghi, console,
+   nguồn).
 
-   .. code-block:: text
+Vị trí công tắc boot theo **Table 1**:
 
-      => mmc dev 1
-      => tftp 0x80800000 u-boot-dtb.imx
-      => mmc write 0x80800000 0x2 0x400   # offset 1KB = sector 2
+.. code-block:: text
 
-3. Cài SW6:
+   eMMC:  SW2 = 01010000 | SW3 = 10
 
-   .. code-block:: text
+Các bước thực hiện
+------------------
 
-      SW6 = [OFF OFF ON ON]   # 0011 — boot từ eMMC (USDHC3)
+.. note::
+   **TODO:** bổ sung các bước chi tiết.
 
-4. Reset board → U-Boot sẽ load từ eMMC.
+Lưu ý
+-----
 
-.. tip::
-   Trong U-Boot dùng lệnh ``mmc dev`` và ``mmc info`` để xác định device
-   nào là SD, device nào là eMMC trên board của bạn.
+.. note::
+   **TODO:** bổ sung lưu ý khi vận hành.
 
 ---
 
-Chế độ 3: Serial Download Mode (USB SDP) — Flash qua UUU
-=========================================================
+Chế độ 3: Boot từ NAND
+======================
 
-**Mục đích:** Khi board **chưa có bootloader** hoặc bạn muốn nạp image mới
-từ PC qua USB OTG. Đây là chế độ quan trọng nhất khi **recover board**.
+**Mục đích:** chạy **U-Boot + Linux** từ flash **NAND**.
 
-**Cách hoạt động:** ROM của i.MX7 hỗ trợ **SDP (Serial Download Protocol)**
-trên USB OTG. ROM chờ PC gửi lệnh nạp code vào RAM qua công cụ **UUU**.
-
-1. **Cài SW6 về Serial Download** và cắm USB OTG (J301) vào PC:
-
-   .. code-block:: text
-
-      SW6 = [OFF OFF ON OFF]   # 0010 — Serial Download
-
-2. **Cài UUU trên PC:**
-
-   .. code-block:: bash
-
-      # Linux
-      git clone https://github.com/nxp-imx/mfgtools && cd mfgtools
-      mkdir build && cd build && cmake .. && make
-
-      # Windows: download uuu.exe từ release page
-
-3. **Flash image qua UUU:**
-
-   .. code-block:: bash
-
-      # Flash bootloader vào eMMC
-      sudo ./uuu -b emmc u-boot-dtb.imx
-
-      # Flash full image (bootloader + kernel + rootfs)
-      sudo ./uuu -b emmc_all imx-image-core-imx7dlsabresd.wic
-
-      # Flash vào SD card thay vì eMMC
-      sudo ./uuu -b sd_all imx-image-core-imx7dlsabresd.wic
-
-4. Sau khi flash xong, đổi SW6 về chế độ boot SD/eMMC và reset.
+Chuẩn bị
+--------
 
 .. note::
-   Nếu UUU không nhận board, kiểm tra:
+   **TODO:** bổ sung danh mục chuẩn bị (flash module, image, công cụ
+   ghi/erase, console, nguồn).
 
-   - USB OTG cắm đúng port (OTG, không phải USB Host)
-   - ``lsusb`` thấy device **NXP Semiconductors (15a2)** với ID ``0076``
-   - Quyền truy cập USB (udev rule hoặc chạy ``sudo``)
+Vị trí công tắc boot theo **Table 1**:
+
+.. code-block:: text
+
+   NAND:  SW2 = 011XXXX0 | SW3 = 10
+
+Các bước thực hiện
+------------------
+
+.. note::
+   **TODO:** bổ sung các bước chi tiết.
+
+Lưu ý
+-----
+
+.. note::
+   **TODO:** bổ sung lưu ý khi vận hành.
 
 ---
 
 Chế độ 4: Boot từ QSPI NOR
 ==========================
 
-**Mục đích:** Boot từ QSPI Flash 16MB — chứa firmware cho Cortex-M4 hoặc
-backup bootloader.
+**Mục đích:** nạp boot image từ flash **QSPI NOR onboard** (16 MB).
 
-1. Ghi firmware vào QSPI từ U-Boot:
+Chuẩn bị
+--------
 
-   .. code-block:: text
+.. note::
+   **TODO:** bổ sung danh mục chuẩn bị (image cho QSPI, công cụ ghi,
+   console, nguồn).
 
-      => sf probe
-      => tftp 0x80800000 m4_image.bin
-      => sf erase 0x0 0x100000
-      => sf write 0x80800000 0x0 ${filesize}
-
-2. Cài SW6:
-
-   .. code-block:: text
-
-      SW6 = [OFF OFF OFF OFF]   # 0000 — Boot từ QSPI NOR
-
-3. Reset → ROM đọc QSPI tại offset 0.
-
-.. warning::
-   QSPI Boot cần boot ROM nhận diện đúng **format header** của image
-   (IVT + DCD). Nếu image M4 không đúng format, ROM sẽ báo lỗi
-   ``Bad Magic Number`` qua console.
-
----
-
-Thứ tự Boot Fallback
-====================
-
-Nếu chế độ boot được chọn **fail** (image corrupt, không đọc được), Boot
-ROM sẽ fallback:
+Vị trí công tắc boot theo **Table 1**:
 
 .. code-block:: text
 
-   1. Boot media được chọn (SD / eMMC / QSPI)
-   2. Nếu fail → USB Serial Download (SDP)   ← luôn là fallback cuối
+   QuadSPI:  SW2 = 10000000 | SW3 = 10
 
-Nhờ vậy, **board không bao giờ "brick" hoàn toàn** — luôn có thể đưa về
-Serial Download để nạp lại image qua UUU.
+Các bước thực hiện
+------------------
 
----
+.. note::
+   **TODO:** bổ sung các bước chi tiết.
 
-Troubleshooting
-===============
+Lưu ý
+-----
 
-.. list-table:: **Lỗi thường gặp khi boot**
-   :widths: 35 65
-   :header-rows: 1
-
-   * - Hiện tượng
-     - Nguyên nhân & cách xử lý
-   * - Không thấy output UART console
-     - Sai baudrate (phải là **115200**), sai UART (debug UART J24), sai chiều TX/RX
-   * - UUU không detect board
-     - SW6 chưa về Serial Download mode, thiếu driver/udev permission USB
-   * - ``Bad Magic Number`` / CRC error
-     - Bootloader ghi sai offset (phải là **1KB offset** cho i.MX7), image corrupt
-   * - Kernel panic ở rootfs
-     - Sai ``root=`` cmdline, sai partition layout, rootfs chưa được flash
-   * - ``mmc write`` không có tác dụng
-     - Chưa chọn đúng device — dùng ``mmc dev <n>`` và ``mmc info`` để kiểm tra
+.. note::
+   **TODO:** bổ sung lưu ý khi vận hành.
 
 ---
 
-**Tham khảo:**
+Chế độ 5: Serial Download (SDP)
+===============================
 
-- `i.MX 7Dual Applications Processor Reference Manual (IMX7DRM)` — chương Boot
-- `SABRE-SD Schematic (SCH-27114)` — bản REV C4
-- `UUU Documentation <https://github.com/nxp-imx/mfgtools>`_
-- `i.MX Yocto Project User's Guide (IMXLXYOCTOUG)` — chương Boot and Update the Board
+**Mục đích:** nạp image vào board **qua USB** từ máy host (UUU / mfgtools)
+— dùng để **flash boot media** hoặc **recover** board khi không boot được.
+
+Chuẩn bị
+--------
+
+.. note::
+   **TODO:** bổ sung danh mục chuẩn bị (UUU, cáp USB OTG, image,
+   console).
+
+Vị trí công tắc boot theo **Table 1**:
+
+.. code-block:: text
+
+   SDP:  SW2 = XXXXXXXX | SW3 = 01
+
+Các bước thực hiện
+------------------
+
+.. note::
+   **TODO:** bổ sung các bước chi tiết.
+
+Lưu ý
+-----
+
+.. note::
+   **TODO:** bổ sung lưu ý khi vận hành.
+
+---
+
+.. important::
+   Nội dung trong tài liệu này đã được **xác minh trên board thực tế** và
+   đối chiếu với tài liệu chính thức của NXP.
+

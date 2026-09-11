@@ -1,239 +1,289 @@
+===============================================================================
 Bipartite Graph (Đồ thị hai phía)
-=================================
+===============================================================================
 
-Kiểm tra tính hai phía (2-coloring) và ghép cặp tối đa (maximum matching)
-trên **đồ thị hai phía** — một trong những cấu trúc đồ thị hữu ích nhất
-trong bài toán gán cặp (assignment).
+.. meta::
+   :description: Giải thích chi tiết về Bipartite Graph (Đồ thị hai phía), thuật toán kiểm tra, Maximum Matching, Định lý König và các bài toán liên quan.
+   :keywords: Bipartite Graph, Đồ thị hai phía, Coloring, Graph Theory, Maximum Matching, Hopcroft-Karp, König, Ford-Fulkerson
 
-**What is this? (Đây là gì?)**
-Đồ thị hai phía là đồ thị mà tập đỉnh chia được thành hai tập rời nhau
-``U`` và ``V`` sao cho **mọi cạnh đều nối một đỉnh thuộc ``U`` với một
-đỉnh thuộc ``V``** — không tồn tại cạnh nào nối hai đỉnh trong cùng một tập.
-
-.. code-block:: text
-
-       U1 --- V1        Mọi cạnh: U -> V
-       U2 --- V1        Không có cạnh U -> U hay V -> V
-       U2 --- V2
-       U3 --- V2
-
-**Where can it be used? (Có thể dùng ở đâu?)**
-- Gán công việc: N công việc cho M nhân viên, mỗi người chỉ làm được một số việc
-- Pairing: sinh viên — phòng ký túc xá, mentor — mentee, khách — bàn ăn
-- Matchmaking trong game, hệ thống ghép cặp người chơi
-- Hệ thống khuyến nghị (user — item), spam detection
-- Lập lịch thi: gán môn học — phòng thi sao cho không trùng
-
-**Which circumstance to use? (Dùng trong hoàn cảnh nào?)**
-- Bài toán có 2 nhóm đối tượng, chỉ có quan hệ "khớp" giữa 2 nhóm
-- Cần ghép cặp tối đa (maximum matching) hoặc ghép sao cho không ai trùng nhau
-- Cần kiểm tra một đồ thị có chia được thành 2 nhóm "không có cạnh nội bộ"
-
-**How to use? (Cách dùng?)**
-1. Chọn một đỉnh bất kỳ, tô màu ``0``
-2. BFS/DFS lan truyền sang các neighbor, tô màu **ngược lại** (``1 - color``)
-3. Nếu gặp đỉnh đã tô **trùng màu** với đỉnh hiện tại → đồ thị **KHÔNG bipartite**
-4. Nếu tô xong toàn bộ thành công → đồ thị bipartite
-
-**When to use? (Khi nào dùng?)**
-- Đồ thị **không có trọng số** trên cạnh (dạng thuần cấu trúc)
-- Số đỉnh lớn, cần thuật toán hiệu quả: kiểm tra bipartite là ``O(V + E)``
-- Cần ghép cặp tối đa: dùng **Kuhn/Hungarian** ``O(V × E)`` hoặc **Hopcroft–Karp** ``O(E × √V)``
+.. contents:: **Mục lục**
+   :depth: 2
+   :local:
 
 ---
 
-Kiểm tra tính Bipartite (2-Coloring bằng BFS)
----------------------------------------------
+1. Định nghĩa
+=============
 
-Định lý (**Kőnig, 1936**): *Một đồ thị là bipartite ⇔ đồ thị không chứa
-chu trình độ dài lẻ (odd cycle).*
+**Bipartite graph** là một đồ thị có thể phân chia tập đỉnh thành hai tập
+riêng biệt :math:`U` và :math:`V` sao cho:
+
+* Mỗi cạnh nối một đỉnh từ :math:`U` với một đỉnh từ :math:`V`.
+* Không có cạnh nào nối hai đỉnh trong cùng một tập.
+
+**Ký hiệu:** :math:`G = (U, V, E)`
+
+Ví dụ
+-----
+
+* **Tập U:** ``{A, B, C}``
+* **Tập V:** ``{1, 2, 3}``
+
+.. code-block:: text
+
+    U = {A, B, C}          V = {1, 2, 3}
+
+    A ----- 1
+    A ----- 2
+    B ----- 2
+    C ----- 3
+
+Mỗi cạnh luôn nối **một đỉnh của U với một đỉnh của V** — không có cạnh
+nội bộ trong U hay trong V.
+
+Ví dụ **không** bipartite — chứa chu trình lẻ (tam giác):
+
+.. code-block:: text
+
+    A --- B
+     \   /
+      \ /
+       C        # Chu trình A → B → C → A có độ dài 3 (lẻ)
+
+---
+
+2. Cách Kiểm Tra Bipartite Graph
+================================
+
+Phương pháp: Tô Màu (2-Coloring) — BFS/DFS
+------------------------------------------
+
+Tô 2 màu vào các đỉnh. Nếu tô được mà không có cạnh nối 2 đỉnh cùng màu
+:math:`\rightarrow` đó là bipartite.
+
+**Ý tưởng:**
+
+#. Bắt đầu từ một đỉnh chưa tô, tô màu ``0``.
+#. BFS/DFS sang các đỉnh kề, tô **màu ngược lại** (``1 - color[u]``).
+#. Nếu gặp đỉnh kề **cùng màu** → đồ thị **không** bipartite.
+#. Lặp lại cho **mỗi connected component** (vì graph có thể rời rạc).
+
+Mã nguồn Python kiểm tra Bipartite Graph:
 
 .. code-block:: python
 
    from collections import deque
 
-   def is_bipartite(graph, n):
-       """
-       graph: danh sách kề — graph[u] = [v, ...]
-       n: số đỉnh (đánh số 0 .. n-1)
-       Trả về: (True, color) nếu bipartite, ngược lại (False, None)
-       """
-       color = [-1] * n
-       for start in range(n):
-           if color[start] != -1:
-               continue
+   def is_bipartite(graph):
+       color = {}
+
+       def bfs(start):
            color[start] = 0
-           queue = deque([start])
+           queue = deque([start])          # deque: popleft O(1) thay vì pop(0) O(n)
+
            while queue:
-               u = queue.popleft()
-               for v in graph[u]:
-                   if color[v] == -1:
-                       color[v] = 1 - color[u]
-                       queue.append(v)
-                   elif color[v] == color[u]:
-                       return False, None   # hai đỉnh kề cùng màu
-       return True, color
+               node = queue.popleft()
+               for neighbor in graph[node]:
+                   if neighbor not in color:
+                       color[neighbor] = 1 - color[node]
+                       queue.append(neighbor)
+                   elif color[neighbor] == color[node]:
+                       return False        # hai đỉnh kề cùng màu
+           return True
+
+       # Kiểm tra từng connected component
+       for node in graph:
+           if node not in color:
+               if not bfs(node):
+                   return False
+       return True
+
+   # Ví dụ sử dụng
+   graph = {
+       'A': ['1', '2'],
+       'B': ['2'],
+       'C': ['3'],
+       '1': ['A'],
+       '2': ['A', 'B'],
+       '3': ['C'],
+   }
+   print(is_bipartite(graph))   # True
+
+**Độ phức tạp:** :math:`O(V + E)` — mỗi đỉnh và mỗi cạnh chỉ được duyệt
+một lần; bộ nhớ :math:`O(V)` cho mảng màu và hàng đợi.
+
+Mối liên hệ với chu trình lẻ
+----------------------------
+
+BFS phát hiện "cùng màu" chính là phát hiện **chu trình lẻ (odd cycle)**:
+khi hai đỉnh kề nhau có cùng màu, tồn tại chu trình đi qua chúng với độ dài
+lẻ. Từ đó có **định lý nền tảng:**
+
+.. important::
+   Một đồ thị là **bipartite** khi và chỉ khi nó **không chứa chu trình
+   có độ dài lẻ**.
+
+---
+
+3. Tính chất
+============
+
+* **Bipartite :math:`\Leftrightarrow` Không có chu trình lẻ:** Một đồ thị
+  là bipartite khi và chỉ khi nó không chứa chu trình có độ dài lẻ.
+* **Chu trình chẵn :math:`\rightarrow` Bipartite** — một chu trình độ dài
+  chẵn luôn tô được so le 2 màu.
+* **Cây là bipartite** — vì cây không có chu trình (nên đương nhiên không
+  có chu trình lẻ). Có thể tô so le theo **độ sâu** (mức chẵn / mức lẻ).
+* **Không có self-loop** — self-loop nối đỉnh với chính nó, vi phạm điều
+  kiện hai tập.
+
+---
+
+4. Các Bài Toán Quan Trọng
+===========================
+
+1. Maximum Bipartite Matching (Ghép cặp tối đa)
+-----------------------------------------------
+* Tìm số cạnh tối đa sao cho **không có hai cạnh nào dùng chung một đỉnh**.
+* **Ứng dụng:** Ghép việc làm cho người, ghép cặp đôi, v.v.
+* **Thuật toán:** Hungarian Algorithm (Kuhn's), **Hopcroft–Karp**.
+
+2. Maximum Weighted Matching
+----------------------------
+* Tương tự nhưng mỗi cạnh có **trọng số**, tìm tổng trọng số tối đa.
+* **Thuật toán:** Hungarian Algorithm (Kuhn–Munkres), :math:`O(n^3)`.
+
+3. Minimum Vertex Cover
+-----------------------
+* Tìm **tập đỉnh nhỏ nhất** chứa ít nhất một đầu mút của mỗi cạnh.
+* **Định lý König:** Trong bipartite graph, kích thước vertex cover tối
+  thiểu **bằng** kích thước matching tối đa:
+
+   .. math::
+
+      |V_{cover}| = |M_{max}|
+
+* **Hệ quả quan trọng:** :math:`|V| - |M_{max}|` chính là kích thước
+  **Maximum Independent Set** (tập đỉnh lớn nhất không có hai đỉnh nào kề
+  nhau) — bài toán NP-hard trên đồ thị tổng quát nhưng **giải được đa
+  thức** trên bipartite graph.
+
+Khái niệm then chốt: Đường tăng cường (Augmenting Path)
+-------------------------------------------------------
+
+Đây là "trái tim" của mọi thuật toán matching:
+
+#. **Matching hiện tại** :math:`M` — tập các cạnh đã ghép.
+#. **Đỉnh tự do** — đỉnh chưa được ghép trong :math:`M`.
+#. **Augmenting path** — đường đi bắt đầu và kết thúc tại **hai đỉnh tự
+   do**, xen kẽ giữa cạnh *chưa ghép* → *đã ghép* → *chưa ghép* → ...
+#. **Bước tăng** — đảo trạng thái các cạnh trên đường (chưa ghép ↔ đã
+   ghép), số lượng matching **tăng thêm 1**.
 
 .. note::
-   Với **đồ thị có trọng số**, một đồ thị là bipartite ⇔ mọi chu trình
-   có **tổng trọng số lẻ** (trường hợp đặc biệt: mỗi cạnh thay đổi dấu
-   qua từng bước — kỹ thuật *Parity Coloring*).
+   **Định lý Berge:** :math:`M` là matching tối đa :math:`\Leftrightarrow`
+   không còn augmenting path đối với :math:`M`. Đây là nền tảng chứng minh
+   tính đúng đắn của các thuật toán matching.
 
 ---
 
-Maximum Matching — Ghép cặp tối đa (Kuhn's Algorithm)
------------------------------------------------------
-
-**What is this? (Đây là gì?)**
-Tìm số cặp ghép được **nhiều nhất** giữa ``U`` và ``V`` sao cho mỗi đỉnh
-chỉ thuộc **một** cặp. Thuật toán Kuhn (Hungarian) giải quyết bài toán
-này bằng kỹ thuật **augmenting path**.
-
-**Định nghĩa quan trọng:**
-
-- **Matching:** tập các cạnh ghép cặp, không hai cạnh nào chia sẻ chung một đỉnh
-- **Augmenting path:** đường đi bắt đầu từ đỉnh *chưa ghép* của ``U``,
-  xen kẽ cạnh *chưa ghép / đã ghép*, và kết thúc tại đỉnh *chưa ghép* của ``V``.
-  Tìm được augmenting path → số cặp ghép tăng thêm 1.
-
-.. code-block:: python
-
-   def kuhn_matching(graph, n_left, n_right):
-       """
-       graph: danh sách kề — graph[u] = [v, ...] với u thuộc tập U
-       Trả về: match — match[v] = u nghĩa là ghép u với v
-       """
-       match = [-1] * n_right   # đỉnh V đang ghép với đỉnh U nào
-
-       def try_kuhn(u, visited):
-           for v in graph[u]:
-               if not visited[v]:
-                   visited[v] = True
-                   if match[v] == -1 or try_kuhn(match[v], visited):
-                       match[v] = u
-                       return True
-           return False
-
-       for u in range(n_left):
-           visited = [False] * n_right
-           try_kuhn(u, visited)
-       return match
-
-**Độ phức tạp:** ``O(V × E)`` — chấp nhận được khi số cạnh vừa phải
-(nhỏ hơn ~10⁵).
-
----
-
-Hopcroft–Karp — Ghép cặp tối đa nhanh hơn
------------------------------------------
-
-**What is this? (Đây là gì?)**
-Phiên bản tối ưu của Kuhn: thay vì tìm augmenting path **từng cái một**,
-Hopcroft–Karp tìm **một tập các augmenting path ngắn nhất** mỗi pha.
-Số pha chỉ là ``O(√V)`` → tổng độ phức tạp ``O(E × √V)``.
-
-**When to use? (Khi nào dùng?)**
-- Đồ thị lớn: số cạnh tới ~10⁵–10⁶ (thuật toán competitive programming)
-- Kuhn quá chậm, cần tối ưu về thời gian
-
-.. code-block:: python
-
-   from collections import deque
-
-   INF = float('inf')
-
-   def hopcroft_karp(graph, n_left, n_right):
-       """
-       graph: danh sách kề — graph[u] = [v, ...] với u thuộc tập U
-       Trả về: số cặp ghép tối đa
-       """
-       match_u = [-1] * n_left    # mỗi đỉnh U ghép với đỉnh V nào
-       match_v = [-1] * n_right   # mỗi đỉnh V ghép với đỉnh U nào
-       dist = [0] * n_left
-
-       def bfs():
-           queue = deque()
-           for u in range(n_left):
-               if match_u[u] == -1:
-                   dist[u] = 0
-                   queue.append(u)
-               else:
-                   dist[u] = INF
-           found = False
-           while queue:
-               u = queue.popleft()
-               for v in graph[u]:
-                   nxt = match_v[v]
-                   if nxt == -1:
-                       found = True
-                   elif dist[nxt] == INF:
-                       dist[nxt] = dist[u] + 1
-                       queue.append(nxt)
-           return found
-
-       def dfs(u):
-           for v in graph[u]:
-               nxt = match_v[v]
-               if nxt == -1 or (dist[nxt] == dist[u] + 1 and dfs(nxt)):
-                   match_u[u] = v
-                   match_v[v] = u
-                   return True
-           dist[u] = INF
-           return False
-
-       matching = 0
-       while bfs():
-           for u in range(n_left):
-               if match_u[u] == -1 and dfs(u):
-                   matching += 1
-       return matching
-
-
----
-
-Định lý Kőnig & Bài toán Vertex Cover
--------------------------------------
-
-**Định lý Kőnig (Kőnig–Egerváry):** Trong đồ thị hai phía,
-số cặp ghép tối đa = số đỉnh ít nhất cần chọn để "che" toàn bộ cạnh
-(**minimum vertex cover**).
-
-Ứng dụng phổ biến: bài toán *"chọn ít ô/đỉnh nhất để đánh dấu toàn bộ
-các cạnh"* — ví dụ gạch chân các hàng/cột trong ma trận để che hết
-các phần tử bị cấm.
-
-.. code-block:: text
-
-   Maximum Matching = Minimum Vertex Cover (chỉ đúng trên đồ thị bipartite)
-
----
-
-Tổng kết độ phức tạp
+5. Ứng Dụng Thực Tế
 ====================
 
-.. list-table:: **Độ phức tạp các thuật toán trên đồ thị hai phía**
-   :widths: 35 25 40
+.. list-table:: **Ứng dụng của Bipartite Graph**
+   :widths: 25 25 25 25
+   :header-rows: 1
+   :align: center
+
+   * - Bài toán
+     - U
+     - V
+     - Cạnh
+   * - **Ghép việc**
+     - Người
+     - Công việc
+     - Khả năng làm
+   * - **Hôn nhân**
+     - Trai
+     - Gái
+     - Tương thích
+   * - **Hội họp**
+     - Người
+     - Phòng
+     - Sở thích
+   * - **Phân công**
+     - Tác vụ
+     - Máy tính
+     - Khả năng
+
+---
+
+6. Ví dụ Code: Maximum Matching (Thuật toán Ford-Fulkerson / DFS)
+===================================================================
+
+Ý tưởng: với mỗi đỉnh :math:`u \in U`, dùng DFS tìm **augmenting path**
+sang bên :math:`V`. Độ phức tạp: :math:`O(V \times E)`.
+
+.. code-block:: python
+
+   def max_matching(n_u, n_v, edges):
+       """
+       n_u   : số đỉnh bên U (0 .. n_u-1)
+       n_v   : số đỉnh bên V (0 .. n_v-1)
+       edges : danh sách kề — edges[u] = list đỉnh v bên V
+       Trả về: số cặp ghép tối đa
+       """
+       # match_v[v] = u  (đỉnh v bên V đã được ghép với u bên U)
+       match_v = [-1] * n_v
+
+       def dfs(u, visited):
+           for v in edges[u]:
+               if visited[v]:
+                   continue
+               visited[v] = True
+
+               # v còn tự do, HOẶC chủ cũ của v (match_v[v]) tìm được
+               # chỗ khác → v "nhường chỗ" cho u  (augmenting path)
+               if match_v[v] == -1 or dfs(match_v[v], visited):
+                   match_v[v] = u
+                   return True
+           return False
+
+       result = 0
+       for u in range(n_u):
+           visited = [False] * n_v
+           if dfs(u, visited):
+               result += 1
+       return result
+
+   # Ví dụ: 3 người, 3 việc
+   #   Người 0 làm được việc [0, 1]
+   #   Người 1 làm được việc [1, 2]
+   #   Người 2 làm được việc [2]
+   print(max_matching(3, 3, [[0, 1], [1, 2], [2]]))   # → 3
+
+Với đồ thị lớn, nên dùng **Hopcroft–Karp** (:math:`O(E \sqrt{V})`) — tìm
+nhiều augmenting path ngắn nhất trong **một pha** thay vì từng đường một.
+
+.. list-table:: **So sánh các thuật toán trên bipartite graph**
+   :widths: 40 30 30
    :header-rows: 1
 
-   * - Thuật toán
+   * - Bài toán
+     - Thuật toán
      - Độ phức tạp
-     - Mục đích
-   * - BFS/DFS 2-Coloring
-     - ``O(V + E)``
-     - Kiểm tra đồ thị có bipartite
-   * - Kuhn (Hungarian)
-     - ``O(V × E)``
-     - Maximum matching, đồ thị vừa phải
-   * - Hopcroft–Karp
-     - ``O(E × √V)``
-     - Maximum matching, đồ thị lớn
-   * - Hungarian (weighted, Kuhn–Munkres)
-     - ``O(V³)``
-     - Ghép cặp tối đa **trọng số**
-
-.. tip::
-   Bài toán thực tế thường giải theo 2 bước:
-
-   #. Mô hình hóa bài toán thành đồ thị hai phía (xác định tập ``U``, ``V`` và cạnh)
-   #. Kiểm tra bipartite (nếu cần), rồi áp dụng maximum matching
-
+   * - Kiểm tra bipartite
+     - BFS/DFS 2-coloring
+     - :math:`O(V + E)`
+   * - Maximum Matching
+     - Hungarian (Kuhn) / Ford–Fulkerson
+     - :math:`O(V \times E)`
+   * - Maximum Matching (đồ thị lớn)
+     - Hopcroft–Karp
+     - :math:`O(E \sqrt{V})`
+   * - Maximum Weighted Matching
+     - Hungarian / Kuhn–Munkres
+     - :math:`O(n^3)`
+   * - Minimum Vertex Cover
+     - Từ max matching (Định lý König)
+     - :math:`O(V + E)`

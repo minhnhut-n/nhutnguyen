@@ -1,5 +1,5 @@
-i.MX 7Dual SabreSD Board
-========================
+i.MX 7Dual SabreSD
+==================
 
 Tài liệu về NXP i.MX 7Dual SabreSD development board (SABRE-SD + LPDDR3).
 

@@ -11,4 +11,4 @@ Các nội dung có thể gồm: lộ trình C/C++, roadmap nhúng, hệ thống
    :titlesonly:
    :glob:
 
-   senior_cpp_developer
+   *
