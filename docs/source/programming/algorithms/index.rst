@@ -19,5 +19,6 @@ Các nội dung có thể bao gồm: tìm kiếm, sắp xếp, quy hoạch độ
    dynamic_programming
    greedy
    graph
+   bipartite
    backtracking
    string

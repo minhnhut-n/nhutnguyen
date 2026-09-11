@@ -8,3 +8,4 @@ Các board cụ thể: Raspberry Pi, Banana Pi M4, BeagleBone, ...
    :caption: Linux Boards
 
    banana_pi/index
+   imx7_sabre/index
