@@ -13,7 +13,7 @@ Kernel to Edge AI
 
 .. _danh-gia-profile:
 
-1. ĐÁNH GIÁ PROFILE & LỢI THẾ CẠNH TRANH (UNFAIR ADVANTAGE)
+1. Profile and Strengths
 =============================================================
 
 Hầu hết kỹ sư AI hiện tại đi lên từ mảng Software/Data Science, giỏi huấn luyện mô hình nhưng thường gặp khó khăn lớn khi triển khai (Deployment) và tối ưu hạ tầng thực thi. Điểm mạnh cốt lõi của bạn nằm ở tầng phần cứng, hệ điều hành và tối ưu hiệu năng.
@@ -33,7 +33,7 @@ Hầu hết kỹ sư AI hiện tại đi lên từ mảng Software/Data Science,
 
 .. _dieu-chinh-du-an:
 
-2. CHIẾN LƯỢC ĐIỀU CHINH DỰ ÁN & HỌC TẬP (LỌC BỎ LAN MAN)
+2. Strategy & Project Re-alignment
 ============================================================
 
 Để khắc phục tình trạng bị quá tải (overwhelmed) và phân tán nguồn lực, hệ thống lại các ý tưởng dự án như sau:
@@ -47,8 +47,8 @@ Hầu hết kỹ sư AI hiện tại đi lên từ mảng Software/Data Science,
 
 .. _du-an-dinh:
 
-3. DỰ ÁN ĐINH: EDGE AI AUDIO / TRANSLATE SYSTEM
-=================================================
+3. Main Project: Edge AI Translate / Audio Processing System
+============================================================
 
 Dự án này là minh chứng rõ nhất cho khả năng kết hợp giữa **System Engineering** và **Edge AI**.
 
@@ -69,8 +69,8 @@ Dự án này là minh chứng rõ nhất cho khả năng kết hợp giữa **S
 
 .. _lo-trinh-5-buoc:
 
-4. LỘ TRÌNH 5 BƯỚC PHÁT TRIỂN TỪ KERNEL SANG EDGE AI
-======================================================
+4. Five paths to Edge AI
+========================
 
 4.1 Bước 1: Nắm AI Nền tảng vừa đủ
 ----------------------------------
@@ -108,8 +108,8 @@ Dự án này là minh chứng rõ nhất cho khả năng kết hợp giữa **S
 
 .. _linux-roadmap:
 
-5. TỐI ƯU LỘ TRÌNH 20 LEVEL LINUX (PHƯƠNG PHÁP JUST-IN-TIME)
-==============================================================
+5. Just-In-Time (JIT) Learning: 20 Level Linux Roadmap  
+======================================================
 
 Không học tuần tự từ Level 0 đến Level 20 để tránh chán nản và ngợp kiến thức. Áp dụng phương pháp **Just-In-Time (JIT) Learning**, chỉ đào sâu các Level trực tiếp phục vụ cho Performance & AI Systems.
 
@@ -141,8 +141,8 @@ Không học tuần tự từ Level 0 đến Level 20 để tránh chán nản v
 
 .. _kanban-board:
 
-6. BẢNG QUẢN LÝ TIẾN ĐỘ (KANBAN BOARD)
-========================================
+6. kanban Board: Project Progress & Goals
+=========================================
 
 .. list-table:: Nhật ký Tiến độ & Mục tiêu
    :widths: 20 50 30
