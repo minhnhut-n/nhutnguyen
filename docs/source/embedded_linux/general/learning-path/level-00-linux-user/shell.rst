@@ -62,8 +62,8 @@ giữa người dùng và máy tính. Tmux giải quyết vấn đề multi-task
 cửa sổ terminal trên cùng một terminal app để chạy song song (parallel task).
 
 "Screen" là công cụ được tích hợp sẵn vào trong linux, nhưng lại ít được cập nhật thậm
-chí còn bị lược bỏ trong các bản phát hành linux, còn "tmux" hiện đại hơn và có thể dể
-dàng cái đặt thông qua lệnh.
+chí còn bị lược bỏ trong các bản phát hành linux, còn "tmux" hiện đại hơn và có thể dễ
+dàng cài đặt thông qua lệnh.
 
 Tmux sẽ mở lại chính session nếu nó bị ngắt kết nối mạng giữa chừng thay vì phải mở và cấu
 hình lại. Điểm khác nhau giữa tmux và mobaxterm (một công cụ hỗ trợ ssh) là khi tab moba đóng
@@ -74,37 +74,141 @@ vẫn chạy bình thường.
 train AI, script run,... Chỉ cần mở mobaxterm hoặc putty từ bất kì máy nào và gõ "tmux attach"
 trạng thái làm việc sẽ được khôi phục.
 
+Mô hình phân cấp trong tmux cần nhớ:
+
+- **Session**: Một phiên làm việc độc lập (ví dụ: ``build``, ``server``). Có thể detach để chạy nền.
+- **Window**: Giống như các tab trong trình duyệt, một session chứa nhiều window.
+- **Pane**: Chia nhỏ một window thành nhiều ô terminal chạy song song.
+
+Phím Prefix mặc định của tmux là ``Ctrl+b``, nghĩa là: nhấn giữ ``Ctrl`` + ``b``,
+thả ra rồi nhấn tiếp phím lệnh. Ví dụ ``Ctrl+b d`` là nhấn ``Ctrl+b`` rồi nhấn ``d``.
+Có thể đổi thành ``Ctrl+a`` (kiểu screen) trong file cấu hình.
+
 .. code-block:: bash
 
    # Install tmux
    sudo apt-get update
    sudo apt-get install tmux
 
-   # New session with name
+   # Kiểm tra phiên bản
+   tmux -V
+
+   # ================= SESSION =================
+   # Tạo session mới có tên (nên đặt tên gợi nhớ)
    tmux new -s s_name
 
-   # Or basic just new
+   # Tạo session mới đơn giản (tên tự sinh 0,1,2...)
    tmux
 
-   # List all session
+   # Tạo session và chạy sẵn lệnh bên trong (vd: top, build)
+   tmux new -s monitor -d top
+   tmux new -s build -d "cd ~/project && make -j$(nproc)"
+
+   # Liệt kê tất cả session đang có
    tmux ls
 
-   # Detach session (Ctrl+b d)
-   # Attach lại session
+   # Detach khỏi session, giữ mọi thứ chạy nền (Prefix + d)
+   # Ctrl+b, sau đó nhấn d
+
+   # Attach lại session theo tên
    tmux attach -t s_name
+   # Viết tắt
+   tmux a -t s_name
+   # Attach session gần nhất vừa detach
+   tmux attach
 
-   # Split pane ngang (Ctrl+b ")
-   # Split pane dọc (Ctrl+b %)
-   # Di chuyển giữa các pane (Ctrl+b + arrow keys)
+   # Attach mà “đuổi” client khác đang bám vào cùng session
+   tmux attach -d -t s_name
 
-   # Thoát tmux session
-   ctrl + b, d
+   # Đổi tên session hiện tại (Prefix + $)
+   # Ctrl+b, sau đó nhấn $ rồi gõ tên mới
 
-   # Xóa một tmux session
-   tmux kill-session -t <session_name>
+   # Đổi tên session từ ngoài
+   tmux rename-session -t old_name new_name
 
-   # Xóa toàn bộ session
+   # Kill/Xóa một session cụ thể
+   tmux kill-session -t s_name
+
+   # Kill tất cả session (dừng server tmux)
    tmux kill-server
+
+   # ================= WINDOW (Tab) =================
+   # Tạo window mới (Prefix + c): Ctrl+b c
+   # Đóng window hiện tại (Prefix + &): Ctrl+b & -> xác nhận y/n
+   # Hoặc gõ trực tiếp: exit
+   # Chuyển window kế tiếp/trước đó: Ctrl+b n / Ctrl+b p
+   # Nhảy tới window số 0-9: Ctrl+b 0, Ctrl+b 1, ...
+   # Liệt kê và chọn window: Ctrl+b w -> arrow keys + Enter
+   # Đổi tên window hiện tại (Prefix + ,): Ctrl+b ,
+   # Đổi tên window từ ngoài:
+   tmux rename-window -t s_name:1 new_window_name
+   # Đổi vị trí window (swap window 1 và 2):
+   tmux swap-window -s 1 -t 2
+
+   # ================= PANE (Chia ô) =================
+   # Split dọc (chia trái-phải) (Prefix + %): Ctrl+b %
+   # Split ngang (chia trên-dưới) (Prefix + "): Ctrl+b "
+   # Di chuyển giữa các pane: Ctrl+b + arrow keys
+   # Chuyển nhanh sang pane kế tiếp: Ctrl+b o
+   # Hiện số pane để nhảy nhanh: Ctrl+b q -> nhấn số 0-9
+   # Phóng to/thu nhỏ pane toàn màn hình (toggle zoom): Ctrl+b z
+   # Xoay vòng layout các pane: Ctrl+b Space
+   # Chuyển layout có sẵn:
+   tmux select-layout even-horizontal
+   tmux select-layout even-vertical
+   tmux select-layout main-horizontal
+   tmux select-layout main-vertical
+   tmux select-layout tiled
+   # Resize pane: Ctrl+b :resize-pane -D 10 (U/D/L/R + số dòng)
+   # Đóng pane hiện tại (Prefix + x): Ctrl+b x -> xác nhận y, hoặc gõ exit
+   # Biến pane thành window riêng: Ctrl+b ! (break-pane)
+   # Gộp window thành pane, vd gộp window 1 vào pane hiện tại:
+   tmux join-pane -s s_name:1
+
+   # ================= COPY MODE (Cuộn, copy, tìm kiếm) =================
+   # Vào chế độ cuộn/copy: Ctrl+b [ (cuộn bằng Arrow/PageUp/PageDown, q để thoát)
+   # Paste nội dung vừa copy: Ctrl+b ]
+   # Mặc định dùng phím emacs. Để dùng vim-style, thêm vào ~/.tmux.conf:
+   # setw -g mode-keys vi
+   # Với mode-keys vi: Ctrl+b [ -> Space bắt đầu chọn, Enter để copy,
+   # / tìm xuống, ? tìm lên
+   # Liệt kê buffer đã copy:
+   tmux list-buffers
+   tmux show-buffer
+   # Lưu lịch sử pane ra file (debug log train/build rất hay):
+   tmux capture-pane -p -S -3000 > ~/tmux_log.txt
+
+   # ================= CẤU HÌNH NHANH (~/.tmux.conf) =================
+   # Bật chuột: cuộn, click chuyển pane, resize bằng chuột:
+   # set -g mouse on
+   # Split dễ nhớ: | chia dọc, - chia ngang:
+   # bind | split-window -h
+   # bind - split-window -v
+   # Dùng vim-keys di chuyển pane: Prefix + h/j/k/l:
+   # bind h select-pane -L
+   # bind j select-pane -D
+   # bind k select-pane -U
+   # bind l select-pane -R
+   # Reload config không cần thoát session (Prefix + r):
+   # bind r source-file ~/.tmux.conf \; display "Reloaded!"
+   # Sau khi sửa file, nạp lại bằng lệnh:
+   tmux source-file ~/.tmux.conf
+   # Xem tất cả phím tắt: Ctrl+b ? hoặc tmux list-keys
+
+Workflow gợi ý khi làm việc remote (SSH + tmux):
+
+1. ``ssh user@server`` vào máy remote.
+2. ``tmux new -s work`` tạo session làm việc.
+3. ``Ctrl+b c`` mở nhiều window: một window code, một window build, một window log.
+4. ``Ctrl+b %`` / ``Ctrl+b "`` chia pane để vừa xem log vừa gõ lệnh.
+5. Mất mạng / tắt laptop -> mọi thứ vẫn chạy. Hôm sau ``ssh`` lại rồi ``tmux attach -t work`` là khôi phục 100%.
+
+Mẹo thực tế:
+
+- Luôn đặt tên session theo task: ``tmux new -s api``, ``tmux new -s bot`` để không nhầm.
+- Dùng ``tmux ls`` trước khi tạo mới để tránh trùng session chạy nền gây tốn RAM/CPU.
+- Khi train AI / build Yocto / bitbake hàng giờ: chạy trong tmux, detach ``Ctrl+b d`` rồi tắt SSH thoải mái.
+- Không nên chạy tmux lồng nhau (tmux trong tmux qua SSH 2 tầng) nếu chưa đổi prefix, rất dễ rối phím.
 
 4. vim / nano
 -------------
